@@ -1,0 +1,19 @@
+{
+  "name": "DataCompressor",
+  "keywords": "DataCompressor, float, ADC",
+  "description": "Library for comression float data",
+  "authors":
+  [
+    {
+      "name": "Pavel Kolesov"
+    }
+  ],
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/Am0k-GIT/DataCompressor_lib"
+  },
+  "version": "1.0.0",
+  "frameworks": "arduino",
+  "platforms": "avr"
+}
