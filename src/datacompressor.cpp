@@ -1,13 +1,15 @@
 #include <Arduino.h>
 #include "datacompressor.h"
 
-void DataCompressor::cashToStack(uint8_t count)
+template <typename T>
+void DataCompressor<T>::cashToStack(uint8_t count)
 {
 	sortArray(m_cashArray, count, ascending);
 	addToStack(filterValue(m_cashArray, count, medianValue, m_cashPrecision));
 }
 
-void DataCompressor::addToStack(float data)
+template <typename T>
+void DataCompressor<T>::addToStack(T data)
 {
 	if (m_full)
 	{
@@ -32,16 +34,18 @@ void DataCompressor::addToStack(float data)
 	m_cashIndex = 0;
 }
 
-DataCompressor::DataCompressor(uint8_t CashSize, uint16_t StackSize)
+template <typename T>
+DataCompressor<T>::DataCompressor(uint8_t CashSize, uint16_t StackSize)
 {
 	m_cashSize = CashSize;
 	m_stackSize = StackSize;
-	m_cashArray = new float[m_cashSize];
-	m_stackArray = new float[m_stackSize];
+	m_cashArray = new T[m_cashSize];
+	m_stackArray = new T[m_stackSize];
 	m_full = 0;
 }
 
-DataCompressor::DataCompressor(const DataCompressor& source)
+template <typename T>
+DataCompressor<T>::DataCompressor(const DataCompressor& source)
 {
 	m_cashSize = source.m_cashSize;
 	m_stackSize = source.m_stackSize;
@@ -51,7 +55,7 @@ DataCompressor::DataCompressor(const DataCompressor& source)
 	m_full = source.m_full;
 	if (source.m_cashArray)
 	{
-		m_cashArray = new float[m_cashSize];
+		m_cashArray = new T[m_cashSize];
 		for (uint8_t i = 0; i < m_cashSize; ++i)
 			m_cashArray[i] = source.m_cashArray[i];
 	}
@@ -59,7 +63,7 @@ DataCompressor::DataCompressor(const DataCompressor& source)
 		m_cashArray = 0;
 	if (source.m_stackArray)
 	{
-		m_stackArray = new float[m_stackSize];
+		m_stackArray = new T[m_stackSize];
 		for (uint16_t i = 0; i < m_stackSize; ++i)
 			m_stackArray[i] = source.m_stackArray[i];
 	}
@@ -67,13 +71,15 @@ DataCompressor::DataCompressor(const DataCompressor& source)
 		m_stackArray = 0;
 }
 
-DataCompressor::~DataCompressor()
+template <typename T>
+DataCompressor<T>::~DataCompressor()
 {
 	delete[] m_cashArray;
 	delete[] m_stackArray;
 }
 
-DataCompressor& DataCompressor::operator=(const DataCompressor& source)
+template <typename T>
+DataCompressor<T>& DataCompressor<T>::operator=(const DataCompressor& source)
 {
 	if (this == &source)
 		return *this;
@@ -87,7 +93,7 @@ DataCompressor& DataCompressor::operator=(const DataCompressor& source)
 	delete[] m_stackArray;
 	if (source.m_cashArray)
 	{
-		m_cashArray = new float[m_cashSize];
+		m_cashArray = new T[m_cashSize];
 		for (uint8_t i = 0; i < m_cashSize; ++i)
 			m_cashArray[i] = source.m_cashArray[i];
 	}
@@ -95,7 +101,7 @@ DataCompressor& DataCompressor::operator=(const DataCompressor& source)
 		m_cashArray = 0;
 	if (source.m_stackArray)
 	{
-		m_stackArray = new float[m_stackSize];
+		m_stackArray = new T[m_stackSize];
 		for (uint16_t i = 0; i < m_stackSize; ++i)
 			m_stackArray[i] = source.m_stackArray[i];
 	}
@@ -104,12 +110,14 @@ DataCompressor& DataCompressor::operator=(const DataCompressor& source)
 	return *this;
 }
 
-float& DataCompressor::operator[] (const uint16_t index)
+template <typename T>
+T& DataCompressor<T>::operator[] (const uint16_t index)
 {
 	return m_stackArray[index];
 }
 
-uint16_t DataCompressor::getLastIndex()
+template <typename T>
+uint16_t DataCompressor<T>::getLastIndex()
 {
 	if (m_full)
 		return (m_stackSize - 1);
@@ -117,12 +125,14 @@ uint16_t DataCompressor::getLastIndex()
 		return (m_stackIndex - 1);
 }
 
-void DataCompressor::setCashPrecision(uint8_t percent)
+template <typename T>
+void DataCompressor<T>::setCashPrecision(uint8_t percent)
 {
 	m_cashPrecision = percent;
 }
 
-void DataCompressor::push(float data)
+template <typename T>
+void DataCompressor<T>::push(T data)
 {
 	m_cashArray[m_cashIndex] = data;
 	m_cashIndex++;
@@ -132,12 +142,14 @@ void DataCompressor::push(float data)
 	}
 }
 
-bool DataCompressor::full()
+template <typename T>
+bool DataCompressor<T>::full()
 {
 	return m_full;
 }
 
-float DataCompressor::getAverage()
+template <typename T>
+float DataCompressor<T>::getAverage()
 {
 	if (m_cashIndex > 0)
 	{
@@ -146,7 +158,8 @@ float DataCompressor::getAverage()
 	return averageValue(m_stackArray, getLastIndex());
 }
 
-float DataCompressor::getMedian()
+template <typename T>
+float DataCompressor<T>::getMedian()
 {
 	if (m_cashIndex > 0)
 	{
@@ -155,7 +168,8 @@ float DataCompressor::getMedian()
 	return  medianValue(m_stackArray, getLastIndex());
 }
 
-float DataCompressor::getFiltered(float (*referenceFcn)(float* array, uint16_t length), uint8_t maxDiffPercent)
+template <typename T>
+float DataCompressor<T>::getFiltered(float (*referenceFcn)(T* array, uint16_t length), uint8_t maxDiffPercent)
 {
 	if (m_cashIndex > 0)
 	{

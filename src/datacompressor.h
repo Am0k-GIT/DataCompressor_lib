@@ -13,6 +13,7 @@
 #include <Arduino.h>
 #include <statistics.h>
 
+template <typename T>
 class DataCompressor {
 
 private:
@@ -22,11 +23,11 @@ private:
 	uint16_t m_stackSize = 0;                                                                         // размер стека
 	uint8_t m_cashPrecision = 20;                                                                     // %, значения с отклонением выше которого отбрасываются при усреднениях
 	bool m_full;                                                                                      // флаг полного заполнения стека
-	float* m_cashArray;                                                                               // динамический массив для кеша
-	float* m_stackArray;                                                                              // динамический массив для стека
+	T* m_cashArray;                                                                                   // динамический массив для кеша
+	T* m_stackArray;                                                                                  // динамический массив для стека
 
 	void cashToStack(uint8_t count);                                                                  // сбрасываем весь кеш в одно значение стека
-	void addToStack(float data);                                                                      // добавляем данные в стек
+	void addToStack(T data);                                                                          // добавляем данные в стек
 
 public:
 
@@ -35,13 +36,13 @@ public:
 	~DataCompressor();                                                                                // деструктор
 
 	DataCompressor& operator=(const DataCompressor& source);                                          // перегрузка =
-	float& operator[] (const uint16_t index);                                                         // перегрузка []
+	T& operator[] (const uint16_t index);                                                             // перегрузка []
 
 	uint16_t getLastIndex();                                                                          // получение последнего записанного индекса в стеке
 	void setCashPrecision(uint8_t percent);                                                           // установка %, значения с отклонением выше которого отбрасываются при усреднениях
-	void push(float data);                                                                            // добавление данных
+	void push(T data);                                                                                // добавление данных
 	bool full();                                                                                      // проверка на заполненность стека
 	float getAverage();                                                                               // получение усредненного значения
 	float getMedian();                                                                                // получение медианного значения
-	float getFiltered(float (*referenceFcn)(float* array, uint16_t length), uint8_t maxDiffPercent);  // получение отфильтрованного значения
+	float getFiltered(float (*referenceFcn)(T* array, uint16_t length), uint8_t maxDiffPercent);      // получение отфильтрованного значения
 };
