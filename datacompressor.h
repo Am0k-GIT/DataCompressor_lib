@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <Arduino.h>
+#include <cstdint>
 #include <statistics.h>
 
 template <typename T>
